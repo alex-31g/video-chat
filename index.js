@@ -20,8 +20,7 @@ peer.on('open', function(id) {
 function startConnection() {
 
 	// Create stream of side A 
-	navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-		.then(mediaStream => {
+	navigator.mediaDevices.getUserMedia({ video: true, audio: true }, mediaStream => {
 			const partnerPeerId = document.querySelector('.partnerPeerId').value;
 
 			// Send stream from side A to side B
@@ -34,28 +33,29 @@ function startConnection() {
 				addVideoToPage(partnersStream);
 			});
 		})
-		.catch(err => { 
-			console.log(err.name + ": " + err.message); 
-		}); 
+		// .catch(err => { 
+		// 	console.log(err.name + ": " + err.message); 
+		// }); 
 }
 
 // Answering a call from side A
 peer.on('call', call => {
 
 	// Create stream of side B
-	navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-		.then(mediaStream => {
+	// navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+	// 	.then(mediaStream => {
+	navigator.mediaDevices.getUserMedia({ video: true, audio: true }, mediaStream => {
 			// Send stream from side B to side A
 			call.answer(mediaStream);
 
 			// Get stream from side A
-			call.on('stream', partnersStream => {
-				addVideoToPage(partnersStream);
+			call.on('stream', partnerStream => {
+				addVideoToPage(partnerStream);
 			});
 		})
-		.catch(err => { 
-			console.log(err.name + ": " + err.message); 
-		}); 
+		// .catch(err => { 
+		// 	console.log(err.name + ": " + err.message); 
+		// }); 
 });
 
 // ================================
