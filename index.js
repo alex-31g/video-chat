@@ -6,7 +6,7 @@
 **/
 
 const btnConnect = document.querySelector('.btnConnect');
-btnConnect.onclick = startConnection;
+btnConnect.onclick = makeCall;
 
 // Create peer connection
 const peer = new Peer();
@@ -17,54 +17,54 @@ peer.on('open', function(id) {
 });
 
 // Connect from side A to B
-function startConnection() {
-
+function makeCall() {
 	// Create stream of side A 
-	navigator.mediaDevices.getUserMedia({ video: true, audio: true }, mediaStream => {
+	navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+		.then(stream => {
 			const partnerPeerId = document.querySelector('.partnerPeerId').value;
 
 			// Send stream from side A to side B
 			// peer.call provide a MediaConnection object
-			const mediaConnection = peer.call(partnerPeerId, mediaStream);
+			const mediaConnection = peer.call(partnerPeerId, stream);
 
 			// Get stream from side B 
 			// MediaConnection emits a stream event whose callback includes the video/audio stream of the other peer
 			mediaConnection.on('stream', partnersStream => {
+				console.log('side A got B');
 				addVideoToPage(partnersStream);
 			});
 		})
-		// .catch(err => { 
-		// 	console.log(err.name + ": " + err.message); 
-		// }); 
+		.catch(err => { 
+			console.log(err.name + ": " + err.message); 
+		}); 
 }
 
 // Answering a call from side A
 peer.on('call', call => {
-
 	// Create stream of side B
-	// navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-	// 	.then(mediaStream => {
-	navigator.mediaDevices.getUserMedia({ video: true, audio: true }, mediaStream => {
+	navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+		.then(stream => {
 			// Send stream from side B to side A
-			call.answer(mediaStream);
+			call.answer(stream);
 
 			// Get stream from side A
 			call.on('stream', partnerStream => {
+				console.log('side B got A')
 				addVideoToPage(partnerStream);
 			});
 		})
-		// .catch(err => { 
-		// 	console.log(err.name + ": " + err.message); 
-		// }); 
+		.catch(err => { 
+			console.log(err.name + ": " + err.message); 
+		}); 
 });
 
 // ================================
 // Below are the functions that add/remove video tags to the page
 // ================================
 
-function addVideoToPage(mediaStream) {
+function addVideoToPage(stream) {
 	const video = createVideoElement();
-  video.srcObject = mediaStream;
+  video.srcObject = stream;
   video.onloadedmetadata = function(e) {
     video.play();
   };
