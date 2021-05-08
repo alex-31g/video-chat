@@ -22,8 +22,6 @@ function startConnection() {
 	// Create stream of side A 
 	navigator.mediaDevices.getUserMedia({ video: true, audio: true })
 		.then(mediaStream => {
-			addVideoToPage(mediaStream); // add video of side A to html
-
 			const partnerPeerId = document.querySelector('.partnerPeerId').value;
 
 			// Send stream from side A to side B
@@ -47,8 +45,6 @@ peer.on('call', call => {
 	// Create stream of side B
 	navigator.mediaDevices.getUserMedia({ video: true, audio: true })
 		.then(mediaStream => {
-			addVideoToPage(mediaStream); // add video of side B to html
-
 			// Send stream from side B to side A
 			call.answer(mediaStream);
 
@@ -77,6 +73,7 @@ function addVideoToPage(mediaStream) {
 function createVideoElement() {
 	const body = document.querySelector('body');
 	const video = document.createElement('video');
+	video.muted = true;
 	body.appendChild(video);
 	createDeleteVideoButton();
 	return video;
