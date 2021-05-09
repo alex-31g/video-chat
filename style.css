@@ -2,6 +2,14 @@ video {
   width: 400px;
 }
 
+.sideA {
+  border: 20px solid black;
+}
+
+.sideB {
+  border: 20px solid red;
+}
+
 button {
   display: block;
 }

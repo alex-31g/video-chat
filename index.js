@@ -21,17 +21,22 @@ function makeCall() {
 	// Create stream of side A 
 	navigator.mediaDevices.getUserMedia({ video: true, audio: true })
 		.then(stream => {
+			const video = document.createElement('video');
+			addVideoToPage(stream, 'a', video);
+
 			const partnerPeerId = document.querySelector('.partnerPeerId').value;
 
 			// Send stream from side A to side B
 			// peer.call provide a MediaConnection object
-			const mediaConnection = peer.call(partnerPeerId, stream);
+			const call = peer.call(partnerPeerId, stream);
+
+			const video2 = document.createElement('video');
 
 			// Get stream from side B 
 			// MediaConnection emits a stream event whose callback includes the video/audio stream of the other peer
-			mediaConnection.on('stream', partnersStream => {
+			call.on('stream', partnerStream => {
 				console.log('side A got B');
-				addVideoToPage(partnersStream);
+				addVideoToPage(partnerStream, 'a', video2);
 			});
 		})
 		.catch(err => { 
@@ -44,13 +49,18 @@ peer.on('call', call => {
 	// Create stream of side B
 	navigator.mediaDevices.getUserMedia({ video: true, audio: true })
 		.then(stream => {
+			const video = document.createElement('video');
+			addVideoToPage(stream, 'b', video);
+
 			// Send stream from side B to side A
 			call.answer(stream);
+
+			const video2 = document.createElement('video');
 
 			// Get stream from side A
 			call.on('stream', partnerStream => {
 				console.log('side B got A')
-				addVideoToPage(partnerStream);
+				addVideoToPage(partnerStream, 'b', video2);
 			});
 		})
 		.catch(err => { 
@@ -62,17 +72,23 @@ peer.on('call', call => {
 // Below are the functions that add/remove video tags to the page
 // ================================
 
-function addVideoToPage(stream) {
-	const video = createVideoElement();
+function addVideoToPage(stream, side, v) {
+	console.log(side)
+	const video = createVideoElement(v);
   video.srcObject = stream;
   video.onloadedmetadata = function(e) {
     video.play();
   };
+	if (side === 'a') {
+		video.classList.add('sideA');
+	} else {
+		video.classList.add('sideB');
+	}
 }
 
-function createVideoElement() {
+function createVideoElement(video) {
 	const body = document.querySelector('body');
-	const video = document.createElement('video');
+	// const video = document.createElement('video');
 	video.muted = true;
 	body.appendChild(video);
 	createDeleteVideoButton();
